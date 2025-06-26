@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -163,10 +162,37 @@ export const MembersPage = ({ onBack }: MembersPageProps) => {
     setMembers(mockMembers);
   }, []);
 
-  const filteredMembers = members.filter(member =>
-    member.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    member.phone.includes(searchTerm)
-  );
+  // Improved search function for Arabic text
+  const normalizeText = (text: string) => {
+    return text
+      .toLowerCase()
+      .trim()
+      // Remove Arabic diacritics
+      .replace(/[\u064B-\u0652]/g, '')
+      // Normalize Arabic letters
+      .replace(/[أإآ]/g, 'ا')
+      .replace(/[ؤ]/g, 'و')
+      .replace(/[ئ]/g, 'ي')
+      .replace(/[ة]/g, 'ه');
+  };
+
+  const filteredMembers = members.filter(member => {
+    const normalizedSearchTerm = normalizeText(searchTerm);
+    const normalizedName = normalizeText(member.name);
+    const normalizedPhone = member.phone.replace(/\s+/g, '');
+    const searchPhone = searchTerm.replace(/\s+/g, '');
+    
+    console.log('Search term:', searchTerm);
+    console.log('Normalized search:', normalizedSearchTerm);
+    console.log('Member name:', member.name);
+    console.log('Normalized name:', normalizedName);
+    console.log('Name includes search:', normalizedName.includes(normalizedSearchTerm));
+    console.log('Phone match:', normalizedPhone.includes(searchPhone));
+    
+    return normalizedName.includes(normalizedSearchTerm) || 
+           normalizedPhone.includes(searchPhone) ||
+           member.name.includes(searchTerm); // Fallback for exact match
+  });
 
   const totalPages = Math.ceil(filteredMembers.length / membersPerPage);
   const startIndex = (currentPage - 1) * membersPerPage;
@@ -265,10 +291,18 @@ export const MembersPage = ({ onBack }: MembersPageProps) => {
               type="text"
               placeholder="البحث بالاسم أو رقم الهاتف..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setCurrentPage(1); // Reset to first page on search
+              }}
               className="pr-10 h-12 text-right"
             />
           </div>
+          {searchTerm && (
+            <div className="mt-2 text-sm text-gray-600 text-right">
+              نتائج البحث: {filteredMembers.length} من إجمالي {members.length}
+            </div>
+          )}
         </div>
 
         {/* Members Count */}
