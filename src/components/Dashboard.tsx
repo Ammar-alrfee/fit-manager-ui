@@ -1,4 +1,3 @@
-
 import { Users, ClipboardCheck, BarChart3, LogOut, Dumbbell } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -39,6 +38,14 @@ export const Dashboard = ({ onNavigate }: DashboardProps) => {
   ];
 
   const employeeActions = [
+    {
+      id: 'members',
+      title: 'إدارة الأعضاء',
+      description: 'إضافة وتعديل بيانات الأعضاء',
+      icon: Users,
+      color: 'bg-blue-500',
+      hoverColor: 'hover:bg-blue-600',
+    },
     {
       id: 'attendance',
       title: 'تسجيل الحضور',
